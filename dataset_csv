@@ -1,0 +1,53 @@
+# Import libraries
+import pandas as pd
+
+# Load CSV dataset
+df = pd.read_csv("data.csv")
+
+# Inspect data
+print("First 5 Rows:")
+print(df.head())
+
+print("\nDataset Information:")
+print(df.info())
+
+print("\nMissing Values:")
+print(df.isnull().sum())
+
+# Clean missing values
+# Numeric columns -> fill with mean
+numeric_cols = df.select_dtypes(include='number').columns
+for col in numeric_cols:
+    df[col].fillna(df[col].mean(), inplace=True)
+
+# Text columns -> fill with mode
+text_cols = df.select_dtypes(include='object').columns
+for col in text_cols:
+    df[col].fillna(df[col].mode()[0], inplace=True)
+
+print("\nMissing Values After Cleaning:")
+print(df.isnull().sum())
+
+# Remove duplicate rows
+df.drop_duplicates(inplace=True)
+
+# Basic statistics
+print("\nSummary Statistics:")
+print(df.describe())
+
+# Example Filtering
+if len(numeric_cols) > 0:
+    filtered = df[df[numeric_cols[0]] > df[numeric_cols[0]].mean()]
+    print("\nFiltered Data:")
+    print(filtered.head())
+
+# Example Grouping & Aggregation
+if len(text_cols) > 0 and len(numeric_cols) > 0:
+    grouped = df.groupby(text_cols[0])[numeric_cols[0]].mean()
+    print("\nGrouped Data:")
+    print(grouped)
+
+# Save cleaned dataset
+df.to_csv("cleaned_data.csv", index=False)
+
+print("\nAnalysis Completed Successfully!")
